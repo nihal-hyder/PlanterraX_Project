@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANTERRAX - About</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 40%, #8B7355 60%, #654321 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+        }
+
+        /* Animated background */
+        .cloud {
+            position: fixed;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.9;
+            animation: float-cloud 25s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud1 {
+            width: 80px;
+            height: 30px;
+            top: 10%;
+            left: -100px;
+        }
+
+        .cloud1::before {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 50px;
+            height: 35px;
+            top: -10px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 100px;
+            height: 35px;
+            top: 25%;
+            left: -150px;
+            animation-delay: 12s;
+        }
+
+        .cloud2::before {
+            width: 50px;
+            height: 50px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud2::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 15px;
+        }
+
+        @keyframes float-cloud {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        .sun {
+            position: fixed;
+            top: 50px;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #FFD700, 0 0 40px #FFA500;
+            animation: pulse-sun 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-sun {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Main Container */
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header Section */
+        .about-header {
+            background: #D2B48C;
+            padding: 40px;
+            border: 6px solid #8B4513;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0 #000;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .about-header::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(139, 69, 19, 0.1) 10px, rgba(139, 69, 19, 0.1) 20px);
+            z-index: -1;
+            border-radius: 15px;
+        }
+
+        .header-logo {
+            width: 100px;
+            height: 100px;
+            background: #2d5016;
+            border: 4px solid #1a3009;
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .about-header h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: #2d5016;
+            text-shadow: 4px 4px 0 rgba(255,255,255,0.5);
+            margin-bottom: 15px;
+        }
+
+        .about-header .tagline {
+            font-size: 1.6rem;
+            color: #654321;
+            margin-bottom: 10px;
+        }
+
+        .nasa-badge {
+            background: #FFD700;
+            color: #2d5016;
+            padding: 10px 20px;
+            border: 3px solid #FFA500;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            display: inline-block;
+            margin-top: 15px;
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        /* Content Sections */
+        .section {
+            background: #D2B48C;
+            padding: 35px;
+            border: 6px solid #8B4513;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0 #000;
+            margin-bottom: 30px;
+            position: relative;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(139, 69, 19, 0.1) 10px, rgba(139, 69, 19, 0.1) 20px);
+            z-index: -1;
+            border-radius: 15px;
+        }
+
+        .section-icon {
+            width: 70px;
+            height: 70px;
+            background: #2d5016;
+            border: 4px solid #1a3009;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .section h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.8rem;
+            color: #2d5016;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+        }
+
+        .section p {
+            font-size: 1.5rem;
+            color: #2d5016;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .section li {
+            font-size: 1.5rem;
+            color: #2d5016;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(139, 69, 19, 0.15);
+            border: 3px solid #8B4513;
+            border-radius: 8px;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .section li::before {
+            content: '🌱';
+            position: absolute;
+            left: 15px;
+            font-size: 1.5rem;
+        }
+
+        /* Feature Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border: 4px solid #2d5016;
+            border-radius: 10px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .feature-box h3 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: #2d5016;
+            margin-bottom: 12px;
+        }
+
+        .feature-box p {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: block;
+            width: fit-content;
+            margin: 30px auto;
+            padding: 18px 40px;
+            background: #FFD700;
+            color: #2d5016;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border: 4px solid #FFA500;
+            border-radius: 8px;
+            box-shadow: 5px 5px 0 #000;
+            transition: all 0.1s;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background: #FFA500;
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #000;
+        }
+
+        .back-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .about-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .section h2 {
+                font-size: 1.4rem;
+            }
+
+            .section p,
+            .section li {
+                font-size: 1.3rem;
+            }
+
+            .section {
+                padding: 25px;
+            }
+
+            .back-button {
+                font-size: 1rem;
+                padding: 15px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="sun"></div>
+
+    <div class="about-container">
+        <!-- Header -->
+        <div class="about-header">
+            <div class="header-logo">🚀</div>
+            <h1>PLANTERRAX</h1>
+            <p class="tagline">Sustainable Farming Through NASA Data</p>
+            <div class="nasa-badge">NASA SPACE APPS 2024</div>
+        </div>
+
+        <!-- Mission Section -->
+        <div class="section">
+            <div class="section-icon">🎯</div>
+            <h2>OUR MISSION</h2>
+            <p>PLANTERRAX is an educational farming simulation game that bridges the gap between complex scientific data and practical agricultural applications. We empower players to make data-driven farming decisions using real NASA satellite imagery and climate data.</p>
+            <p>Our goal is to demonstrate how modern technology can revolutionize agriculture by optimizing crop yields, reducing resource consumption, and minimizing environmental impact.</p>
+        </div>
+
+        <!-- The Challenge Section -->
+        <div class="section">
+            <div class="section-icon">⚡</div>
+            <h2>THE CHALLENGE</h2>
+            <p>Agriculture faces unprecedented challenges as the world population grows and climate patterns shift. While advanced technologies like satellite imagery and climate modeling exist, there is a significant knowledge gap in their accessibility and application, especially for smaller farms.</p>
+            <p>PLANTERRAX addresses this by creating an engaging, educational platform that makes NASA's wealth of real-time data on climate conditions, soil moisture, and vegetation health accessible to everyone.</p>
+        </div>
+
+        <!-- Game Features Section -->
+        <div class="section">
+            <div class="section-icon">🎮</div>
+            <h2>GAME FEATURES</h2>
+            <div class="features-grid">
+                <div class="feature-box">
+                    <h3>REAL NASA DATA</h3>
+                    <p>Access authentic satellite imagery and climate reports</p>
+                </div>
+                <div class="feature-box">
+                    <h3>FARM SIMULATION</h3>
+                    <p>Manage fertilization, irrigation, and livestock</p>
+                </div>
+                <div class="feature-box">
+                    <h3>DATA VISUALIZATION</h3>
+                    <p>Interactive maps and charts simplify complex data</p>
+                </div>
+                <div class="feature-box">
+                    <h3>SUSTAINABILITY TRACKING</h3>
+                    <p>Monitor your environmental impact in real-time</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- What You'll Learn Section -->
+        <div class="section">
+            <div class="section-icon">📚</div>
+            <h2>WHAT YOU'LL LEARN</h2>
+            <ul>
+                <li>How to interpret NASA satellite imagery for agricultural purposes</li>
+                <li>Using climate data to optimize irrigation and fertilization timing</li>
+                <li>Understanding soil moisture levels and their impact on crop health</li>
+                <li>Implementing sustainable farming practices based on real data</li>
+                <li>Making informed decisions that balance productivity with conservation</li>
+                <li>Recognizing the connection between weather patterns and crop success</li>
+            </ul>
+        </div>
+
+        <!-- Educational Impact Section -->
+        <div class="section">
+            <div class="section-icon">🌍</div>
+            <h2>EDUCATIONAL IMPACT</h2>
+            <p>PLANTERRAX transforms complex scientific data into an accessible learning experience. Through realistic farming scenarios, players develop practical skills in data analysis and sustainable agriculture.</p>
+            <p>By simulating the challenges faced by real farmers, we help players understand how technology can address global food security while preserving our planet's resources for future generations.</p>
+        </div>
+
+        <!-- Technology Section -->
+        <div class="section">
+            <div class="section-icon">🛰️</div>
+            <h2>POWERED BY NASA</h2>
+            <p>Our game leverages NASA's open data initiative, incorporating datasets that provide real-time information on:</p>
+            <ul>
+                <li>Climate conditions and weather forecasting</li>
+                <li>Soil moisture at various depths</li>
+                <li>Vegetation health and growth patterns</li>
+                <li>Temperature variations and seasonal trends</li>
+                <li>Precipitation patterns and water availability</li>
+            </ul>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="section">
+            <div class="section-icon">✨</div>
+            <h2>JOIN THE MOVEMENT</h2>
+            <p>Whether you're a student, educator, farmer, or simply interested in sustainable agriculture, PLANTERRAX offers valuable insights into how technology and data can shape the future of farming.</p>
+            <p>Start your journey today and discover how NASA's cutting-edge data can help you become a smarter, more sustainable farmer!</p>
+        </div>
+
+        <!-- Back Button -->
+        <a href="/" class="back-button">← BACK TO HOME</a>
+    </div>
+
+</body>
+</html>

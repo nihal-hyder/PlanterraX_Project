@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <title>PLANTERRAX — Level</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --space-blue:#003366; --earth-green:#4CAF50; --card:#fffdf6;
+      --edge:3px; --shadow:0 14px 30px rgba(0,0,0,.35);
+    }
+    body { font-family:'VT323', monospace; background:#fff!important; height:100vh; overflow:hidden; image-rendering:pixelated; }
+    #map { width:100%; height:100vh; }
+
+    /* RIGHT PANEL */
+    .prx-tab{position:fixed;top:50%;right:0;transform:translateY(-50%);z-index:9999;writing-mode:vertical-rl;text-orientation:mixed;user-select:none;cursor:pointer;background:var(--earth-green);color:#fff;padding:14px 10px;border-left:var(--edge) solid #1d3f1f;border-top:var(--edge) solid #1d3f1f;border-bottom:var(--edge) solid #1d3f1f;border-radius:10px 0 0 10px;box-shadow:var(--shadow);font-family:"Press Start 2P",cursive;letter-spacing:1px;}
+    .prx-tab:focus{outline:2px dashed #fff;outline-offset:2px}
+    .prx-panel{position:fixed;top:0;right:0;height:100%;width:min(380px,92vw);z-index:9998;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);padding:16px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,#d7b07b 0%,#c79a61 100%);border-left:var(--edge) solid #3a2816;border-top:var(--edge) solid #3a2816;border-bottom:var(--edge) solid #3a2816;box-shadow:var(--shadow);}
+    .prx-panel.is-open{transform:translateX(0)}
+
+    /* LEFT PANEL */
+    .prx-tab-left{position:fixed;top:50%;left:0;transform:translateY(-50%);z-index:9999;writing-mode:vertical-rl;text-orientation:mixed;user-select:none;cursor:pointer;background:#5a9bd5;color:#fff;padding:14px 10px;border-right:var(--edge) solid #1d3f5f;border-top:var(--edge) solid #1d3f5f;border-bottom:var(--edge) solid #1d3f5f;border-radius:0 10px 10px 0;box-shadow:var(--shadow);font-family:"Press Start 2P",cursive;letter-spacing:1px;}
+    .prx-tab-left:focus{outline:2px dashed #fff;outline-offset:2px}
+    .prx-panel-2{position:fixed;top:0;left:0;height:100%;width:min(380px,92vw);z-index:9998;transform:translateX(-100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);padding:16px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,#7ba7d7 0%,#6189c7 100%);border-right:var(--edge) solid #1d2f3f;border-top:var(--edge) solid #1d2f3f;border-bottom:var(--edge) solid #1d2f3f;box-shadow:var(--shadow);}
+    .prx-panel-2.is-open{transform:translateX(0)}
+
+    /* COMMON PANEL */
+    .prx-head{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;background:var(--card);border:var(--edge) solid #222;border-radius:10px;box-shadow:inset 0 0 0 var(--edge) #fff,0 6px 0 #0001;}
+    .prx-title{display:flex;gap:8px;align-items:center;font-family:"Press Start 2P",cursive;font-size:12px;color:var(--space-blue);text-transform:uppercase;}
+    .sprout{width:20px;height:20px;display:grid;place-items:center;background:var(--earth-green);color:#fff;border:var(--edge) solid #222;border-radius:6px;box-shadow:inset 0 0 0 var(--edge) #c6f7c5;font-size:14px;}
+    .prx-close{font-family:"Press Start 2P",cursive;font-size:10px;padding:10px 12px;background:#ffdd57;border:var(--edge) solid #222;border-radius:8px;cursor:pointer;box-shadow:0 4px 0 #c9a62c;transition:transform .05s;}
+    .prx-close:active{transform:translateY(2px);box-shadow:0 2px 0 #c9a62c}
+    .prx-close:focus{outline:2px dashed #222;outline-offset:3px}
+    .prx-list{background:var(--card);border:var(--edge) solid #222;border-radius:12px;padding:12px;overflow:auto;flex:1;box-shadow:inset 0 0 0 var(--edge) #fff;}
+    .prx-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:14px 10px;border-bottom:2px dashed #cdbb9b;}
+    .prx-row:last-child{border-bottom:none;}
+    .prx-key{font-family:"Press Start 2P",cursive;font-size:13px;color:#111;text-shadow:0 1px 0 #fff;}
+    .prx-val{font-size:16px;color:#444;opacity:.95;}
+    .hud{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+    .hud .box{background:#ffecc6;border:var(--edge) solid #222;border-radius:10px;padding:10px;text-align:center}
+    .hud .box .label{font-size:12px;color:#333}
+    .hud .box .num{font-size:20px}
+
+    /* Water control styling */
+    .water-row{display:flex;align-items:center;justify-content:space-between;padding:14px 10px;border-bottom:2px dashed #c9d7f0}
+    .water-amount{font-size:22px}
+    .btn{font-family:"Press Start 2P",cursive;font-size:14px;padding:10px 14px;background:#7ec3ff;border:var(--edge) solid #1d3f5f;border-radius:8px;cursor:pointer;box-shadow:0 4px 0 #2b6ea8;transition:transform .05s}
+    .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #2b6ea8}
+    .btn-cta{background:#FFD700;border-color:#b07a00;box-shadow:0 4px 0 #b07a00}
+    .btn-danger{background:#ff9aa1;border-color:#9e2530;box-shadow:0 4px 0 #9e2530}
+
+    /* Modal (pop-out) */
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:10000;
+    }
+    .modal{
+      width:min(520px,92vw);background:var(--card);
+      border:var(--edge) solid #222;border-radius:14px;
+      box-shadow:var(--shadow), inset 0 0 0 var(--edge) #fff;
+      padding:18px; display:flex; flex-direction:column; gap:12px;
+      transform:translateY(10px); animation:pop .18s ease-out;
+    }
+    @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .modal-header{display:flex;align-items:center;justify-content:space-between}
+    .modal-title{display:flex;gap:10px;align-items:center;font-family:"Press Start 2P",cursive;font-size:14px;color:#2d5016;text-transform:uppercase}
+    .badge{background:#4CAF50;color:#fff;border:var(--edge) solid #1a3009;border-radius:8px;padding:6px 10px;box-shadow:inset 0 0 0 var(--edge) #c6f7c5}
+    .modal-body{font-size:16px;color:#333;line-height:1.5}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+    .hidden{display:none}
+    .success-emoji{font-size:22px;margin-right:6px}
+    .error-emoji{font-size:22px;margin-right:6px}
+    .help-block{margin-top:8px;padding:10px;background:#fff7d6;border:var(--edge) solid #d1b24a;border-radius:10px}
+
+    @media (max-width:420px){.prx-key{font-size:12px}.prx-val{font-size:13px}}
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <!-- LEFT panel opener -->
+  <button id="prxOpenLeft" class="prx-tab-left" aria-controls="prxPanelLeft" aria-expanded="false">CONTROL</button>
+
+  <!-- LEFT panel (Water controls + Done) -->
+  <aside id="prxPanelLeft" class="prx-panel-2" role="dialog" aria-modal="true" aria-labelledby="prxTitleLeft" aria-hidden="true">
+    <div class="prx-head">
+      <div class="prx-title" id="prxTitleLeft"><span class="sprout">💧</span> Irrigation</div>
+      <button class="prx-close" id="prxCloseBtnLeft" type="button">CLOSE</button>
+    </div>
+    <div class="prx-list" id="leftPanelList">
+      <div class="water-row">
+        <div>
+          <div class="prx-key" style="margin-bottom:6px">Water to add</div>
+          <div class="prx-val">percentage points (0–100)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button id="btnDecWater" class="btn" aria-label="Decrease water">−</button>
+          <div id="waterAmount" class="water-amount">10%</div>
+          <button id="btnAddWater" class="btn" aria-label="Increase water">+</button>
+        </div>
+      </div>
+      <div class="water-row" style="justify-content:flex-end; gap:12px">
+        <button id="btnResetWater" class="btn" aria-label="Reset">Reset</button>
+        <button id="btnSubmit" class="btn btn-cta" aria-label="Done">Done</button>
+      </div>
+      <div class="water-row" style="justify-content:flex-end; gap:12px">
+        <button id="btnResetStats" class="btn btn-danger" aria-label="Reset Stats">Reset Stats</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT panel opener -->
+  <button id="prxOpenTab" class="prx-tab" aria-controls="prxPanel" aria-expanded="false">DATA</button>
+
+  <!-- RIGHT panel (Telemetry + Progress HUD) -->
+  <aside id="prxPanel" class="prx-panel" role="dialog" aria-modal="true" aria-labelledby="prxTitle" aria-hidden="true">
+    <div class="prx-head">
+      <div class="prx-title" id="prxTitle"><span class="sprout">🌱</span> Field Telemetry</div>
+      <button class="prx-close" id="prxCloseBtn" type="button">CLOSE</button>
+    </div>
+    <div class="prx-list" id="rightPanelList">
+      <!-- Filled by JS -->
+    </div>
+  </aside>
+
+  <!-- Themed Modal (Pop-out) -->
+  <div id="resultOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle"><span class="sprout">📊</span> Decision Feedback</div>
+        <span id="modalBadge" class="badge">Status</span>
+      </div>
+      <div id="modalBody" class="modal-body">...</div>
+      <div id="modalActions" class="modal-actions">
+        <!-- Buttons injected by JS depending on result -->
+      </div>
+    </div>
+  </div>
+
+  <!-- CDN JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+  <script>
+    // Initial level from Flask
+    const INITIAL_LEVEL = Number('{{ initial_level|default(1, true) }}');
+
+    // RIGHT panel toggle
+    const prxOpenTab = document.getElementById("prxOpenTab");
+    const prxPanel = document.getElementById("prxPanel");
+    const prxCloseBtn = document.getElementById("prxCloseBtn");
+    prxOpenTab.addEventListener("click", () => {
+      const isOpen = prxPanel.classList.toggle("is-open");
+      prxOpenTab.setAttribute("aria-expanded", isOpen);
+      prxPanel.setAttribute("aria-hidden", !isOpen);
+    });
+    prxCloseBtn.addEventListener("click", () => {
+      prxPanel.classList.remove("is-open");
+      prxOpenTab.setAttribute("aria-expanded", "false");
+      prxPanel.setAttribute("aria-hidden", "true");
+    });
+
+    // LEFT panel toggle
+    const prxOpenLeft = document.getElementById("prxOpenLeft");
+    const prxPanelLeft = document.getElementById("prxPanelLeft");
+    const prxCloseBtnLeft = document.getElementById("prxCloseBtnLeft");
+    prxOpenLeft.addEventListener("click", () => {
+      const isOpen = prxPanelLeft.classList.toggle("is-open");
+      prxOpenLeft.setAttribute("aria-expanded", isOpen);
+      prxPanelLeft.setAttribute("aria-hidden", !isOpen);
+    });
+    prxCloseBtnLeft.addEventListener("click", () => {
+      prxPanelLeft.classList.remove("is-open");
+      prxOpenLeft.setAttribute("aria-expanded", "false");
+      prxPanelLeft.setAttribute("aria-hidden", "true");
+    });
+
+    // Map
+    const map = L.map('map').setView([30, 70], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    // --- NASA GIBS WMTS layers (visual proof of NASA data) ---
+    const gibsAttribution = 'Imagery © NASA EOSDIS GIBS';
+    const todayISO = new Date().toISOString().slice(0,10);
+
+    const smapSoilMoisture = L.tileLayer(
+      `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/SMAP_L4_Soil_Moisture_RZ_v6/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png?time=${todayISO}`,
+      { attribution: gibsAttribution, opacity: 0.65, zIndex: 500 }
+    );
+    const modisLandCover = L.tileLayer(
+      `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Land_Cover_Type_Yearly_MCD12Q1/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png?time=2022-01-01`,
+      { attribution: gibsAttribution, opacity: 0.5, zIndex: 500 }
+    );
+    const imergPrecip = L.tileLayer(
+      `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GPM_3IMERGHH_07_precipitationCal/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png?time=${todayISO}`,
+      { attribution: gibsAttribution, opacity: 0.5, zIndex: 500 }
+    );
+
+    L.control.layers(
+      null,
+      {
+        "SMAP Soil Moisture (L4 RZ)": smapSoilMoisture,
+        "Land Cover (MODIS)": modisLandCover,
+        "Precip (GPM IMERG)": imergPrecip
+      },
+      { collapsed: true, position: "topleft" }
+    ).addTo(map);
+    smapSoilMoisture.addTo(map);
+
+    const drawn = new L.FeatureGroup();
+    map.addLayer(drawn);
+
+    const drawControl = new L.Control.Draw({
+      edit: { featureGroup: drawn },
+      draw: { polygon: true }
+    });
+    map.addControl(drawControl);
+
+    function makeSquare(lat, lng, size = 0.5) {
+      return [
+        [lat - size, lng - size],
+        [lat - size, lng + size],
+        [lat + size, lng + size],
+        [lat + size, lng - size]
+      ];
+    }
+
+    const fixedPolygons = {
+      1: makeSquare(42.0045, -93.2146),
+      2: makeSquare(31.1471, 75.3412),
+      3: makeSquare(-1.2921, 36.8219),
+      4: makeSquare(53.9333, -116.5765),
+      5: makeSquare(-23.5505, -46.6333)
+    };
+
+    // Elements
+    const rightPanelList = document.getElementById("rightPanelList");
+    const waterAmountEl = document.getElementById("waterAmount");
+    const btnAddWater = document.getElementById("btnAddWater");
+    const btnDecWater = document.getElementById("btnDecWater");
+    const btnResetWater = document.getElementById("btnResetWater");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const btnResetStats = document.getElementById("btnResetStats");
+    const overlay = document.getElementById("resultOverlay");
+    const modalBadge = document.getElementById("modalBadge");
+    const modalBody = document.getElementById("modalBody");
+    const modalActions = document.getElementById("modalActions");
+
+    // === NASA EARTHDATA helpers (POWER + SMAP + MODIS) ===
+    let lastEarth = null; // cache of combined response
+
+    async function fetchEarth(lat, lon) {
+      const r = await fetch(`/api/earthdata?lat=${lat}&lon=${lon}`);
+      return r.json();
+    }
+
+    function polygonCenter(coords) {
+      const lats = coords.map(c => c[0]);
+      const lons = coords.map(c => c[1]);
+      return [
+        (Math.min(...lats) + Math.max(...lats)) / 2,
+        (Math.min(...lons) + Math.max(...lons)) / 2
+      ];
+    }
+
+    // State
+    let currentLevel = 1;
+    let currentPolygon = null;
+    let waterToAdd = 10; // percentage points
+    let lastState = null; // cache of server state
+    let lastResult = null; // store last evaluation result for "Next Level" click
+
+    // Helpers: server calls
+    async function postJSON(url, payload) {
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload || {})
+      });
+      return r.json();
+    }
+    async function getJSON(url) {
+      const r = await fetch(url);
+      return r.json();
+    }
+
+    async function setLevel(level) {
+      const data = await postJSON("/api/set_level", { level });
+      if (data.ok) {
+        currentLevel = data.currentLevel;
+        lastState = data.state;
+        await refreshUI(lastState);
+      } else {
+        alert("Failed to initialize level.");
+      }
+    }
+
+    // Make async so we can await Earthdata fetch
+    async function fitCameraFor(level) {
+      drawn.clearLayers();
+      currentPolygon = null;
+
+      if (fixedPolygons[level]) {
+        const polyCoords = fixedPolygons[level];
+        currentPolygon = L.polygon(polyCoords).addTo(drawn);
+        const bounds = L.latLngBounds(polyCoords.map(([a,b]) => L.latLng(a,b)));
+        map.fitBounds(bounds, { padding: [40, 40] });
+
+        // --- get NASA Earthdata (POWER + SMAP + MODIS) for polygon center ---
+        const [clat, clon] = polygonCenter(polyCoords);
+        try {
+          const ed = await fetchEarth(clat, clon);
+          lastEarth = ed.ok ? ed : null;
+        } catch (e) {
+          lastEarth = null;
+        }
+
+        currentPolygon.bindPopup(`Level ${level}`).openPopup();
+      }
+    }
+
+    function hudHTML(progress) {
+      const { best_level, total_attempts, total_correct, current_streak, best_streak } = progress || {};
+      return `
+        <div class="hud">
+          <div class="box"><div class="label">Level</div><div class="num">${currentLevel}</div></div>
+          <div class="box"><div class="label">Best Lv</div><div class="num">${best_level ?? "-"}</div></div>
+          <div class="box"><div class="label">Streak</div><div class="num">${current_streak ?? 0}</div></div>
+          <div class="box"><div class="label">Best Streak</div><div class="num">${best_streak ?? 0}</div></div>
+          <div class="box"><div class="label">Attempts</div><div class="num">${total_attempts ?? 0}</div></div>
+          <div class="box"><div class="label">Correct</div><div class="num">${total_correct ?? 0}</div></div>
+        </div>
+      `;
+    }
+
+    function renderRightPanel(state, feedbackMsg = "", progress = null) {
+      const { soilType, moisture, capacity, idealLow, idealHigh, forecastRain, crop } = state;
+
+      // Prefer POWER rain_today from Earthdata if available; else use simulated forecast
+      const rainToday = (lastEarth && lastEarth.power && typeof lastEarth.power.rain_today === "boolean")
+        ? lastEarth.power.rain_today : forecastRain;
+      const rainBadge = rainToday ? "Yes 🌧️" : "No ☀️";
+
+      let extraRows = "";
+      if (lastEarth) {
+        if (lastEarth.power) {
+          extraRows += `
+            <div class="prx-row">
+              <div class="prx-key">POWER Precip (today)</div>
+              <div class="prx-val">${lastEarth.power.precip_mm ?? "–"} mm</div>
+            </div>
+            <div class="prx-row">
+              <div class="prx-key">POWER RH (today)</div>
+              <div class="prx-val">${lastEarth.power.rel_humidity_pct ?? "–"} %</div>
+            </div>`;
+        }
+        if (lastEarth.smap) {
+          extraRows += `
+            <div class="prx-row">
+              <div class="prx-key">SMAP Root-zone SM</div>
+              <div class="prx-val">${lastEarth.smap.rootzone_sm_m3m3 ?? "–"} m³/m³</div>
+            </div>
+            <div class="prx-row">
+              <div class="prx-key">SMAP Surface SM</div>
+              <div class="prx-val">${lastEarth.smap.surface_sm_m3m3 ?? "–"} m³/m³</div>
+            </div>`;
+        }
+        if (lastEarth.modis) {
+          const lc = lastEarth.modis.landcover_label ?? "–";
+          const cropTxt = (lastEarth.modis.is_cropland ? "Cropland ✅" : "Not Cropland");
+          extraRows += `
+            <div class="prx-row">
+              <div class="prx-key">Land Cover (MODIS)</div>
+              <div class="prx-val">${lc}</div>
+            </div>
+            <div class="prx-row">
+              <div class="prx-key">“Crop”</div>
+              <div class="prx-val">${cropTxt}</div>
+            </div>`;
+        }
+      }
+
+      rightPanelList.innerHTML = `
+        ${hudHTML(progress || {})}
+        <div class="prx-row">
+          <div class="prx-key">Crop (Game)</div><div class="prx-val">${crop} (ideal ${idealLow}%–${idealHigh}%)</div>
+        </div>
+        <div class="prx-row">
+          <div class="prx-key">Soil (Game)</div><div class="prx-val">${soilType} (max ${capacity}%)</div>
+        </div>
+        <div class="prx-row">
+          <div class="prx-key">Soil Moisture (Game)</div><div class="prx-val">${moisture}%</div>
+        </div>
+        <div class="prx-row">
+          <div class="prx-key">Rain Today</div><div class="prx-val">${rainBadge}</div>
+        </div>
+        ${extraRows}
+        <div class="prx-row">
+          <div class="prx-key">You will add</div><div class="prx-val">${waterToAdd}%</div>
+        </div>
+        ${feedbackMsg ? `
+        <div class="prx-row">
+          <div class="prx-key">Result</div><div class="prx-val">${feedbackMsg}</div>
+        </div>` : ``}
+      `;
+    }
+
+    function refreshWaterUI(state) {
+      waterAmountEl.textContent = `${waterToAdd}%`;
+      if (currentPolygon && state) {
+        currentPolygon.setPopupContent(
+          `Level ${currentLevel}<br>Crop: ${state.crop}<br>Soil: ${state.soilType}<br>Moisture: ${state.moisture}%<br>Add: ${waterToAdd}%`
+        ).openPopup();
+      }
+    }
+
+    async function refreshUI(state, feedbackMsg = "", progressOverride = null) {
+      // IMPORTANT: await so lastEarth is ready before rendering the panel
+      await fitCameraFor(currentLevel);
+      let progress = progressOverride;
+      if (!progress) {
+        const p = await getJSON("/api/progress");
+        progress = p.ok ? p.progress : {};
+      }
+      renderRightPanel(state, feedbackMsg, progress);
+      refreshWaterUI(state);
+    }
+
+    // Water controls
+    btnAddWater.addEventListener("click", () => {
+      waterToAdd = Math.min(100, waterToAdd + 1);
+      refreshWaterUI(lastState);
+      renderRightPanel(lastState, "", {});
+    });
+    btnDecWater.addEventListener("click", () => {
+      waterToAdd = Math.max(0, waterToAdd - 1);
+      refreshWaterUI(lastState);
+      renderRightPanel(lastState, "", {});
+    });
+    btnResetWater.addEventListener("click", () => {
+      waterToAdd = 10;
+      refreshWaterUI(lastState);
+      renderRightPanel(lastState, "", {});
+    });
+
+    btnResetStats.addEventListener("click", async () => {
+      const ok = confirm("Reset your progress stats? This cannot be undone.");
+      if (!ok) return;
+      const res = await postJSON("/api/reset_progress", {});
+      if (res.ok) {
+        const s = await getJSON("/api/state");
+        lastState = s.state;
+        await refreshUI(lastState, "Stats reset ✅", s.progress);
+      }
+    });
+
+    // ---- Modal helpers ----
+    function showModal() {
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+    }
+    function hideModal() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      modalBody.innerHTML = "";
+      modalActions.innerHTML = "";
+    }
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) hideModal();
+    });
+
+    function buildWrongAdvice(fb) {
+      const lo = fb.idealRange[0];
+      const hi = fb.idealRange[1];
+      const cap = fb.capacity;
+      const oldM = fb.oldMoisture;
+      const rain = fb.forecastRain;
+
+      let adjustedHi = Math.min(hi, cap);
+      if (rain) adjustedHi = Math.max(lo, adjustedHi - 10); // RAIN_BUFFER = 10
+
+      if (fb.decision === "Too little") {
+        const neededToLow = Math.max(0, +(lo - fb.newMoisture).toFixed(1));
+        return `
+          <div class="help-block">
+            Your new moisture (${fb.newMoisture}%) is below the ideal minimum (${lo}%).
+            Add about <strong>${neededToLow}%</strong> more water to reach the safe zone
+            ${rain ? `(rain forecast — aim ≤ ${adjustedHi}%)` : `(≤ ${adjustedHi}%)`}.
+          </div>
+        `;
+      } else { // Overwatered
+        const maxAddFromStart = Math.max(0, +(adjustedHi - oldM).toFixed(1));
+        return `
+          <div class="help-block">
+            That’s overwatering: your new moisture (${fb.newMoisture}%) is above the safe limit
+            ${rain ? `(rain forecast — limit ${adjustedHi}%)` : `(limit ${adjustedHi}%)`}.
+            From your starting ${oldM}%, add at most <strong>${maxAddFromStart}%</strong> this turn.
+          </div>
+        `;
+      }
+    }
+
+    function fillModalSuccess(fb, res) {
+      modalBadge.textContent = "Correct ✅";
+      modalBadge.style.background = "#4CAF50";
+      modalBadge.style.borderColor = "#1a3009";
+
+      modalBody.innerHTML = `
+        <div><span class="success-emoji">🎉</span><strong>Wow you have done really good!</strong></div>
+        <div style="margin-top:8px">
+          Soil: ${fb.soilType} (cap ${fb.capacity}%)<br>
+          Crop: ${fb.crop} (ideal ${fb.idealRange[0]}%–${fb.idealRange[1]}%)<br>
+          Old: ${fb.oldMoisture}% | Added: ${fb.waterAdded}% → New: <strong>${fb.newMoisture}%</strong>
+        </div>
+      `;
+
+      modalActions.innerHTML = `
+        <button id="btnNextLevel" class="btn btn-cta">Next Level →</button>
+        <button id="btnCloseModal" class="btn">Close</button>
+      `;
+
+      document.getElementById("btnCloseModal").onclick = hideModal;
+      document.getElementById("btnNextLevel").onclick = async () => {
+        currentLevel = res.currentLevel;
+        lastState = res.nextState;
+        waterToAdd = 10;
+        await refreshUI(lastState, "Great job! Moving on…", res.progress);
+        hideModal();
+      };
+    }
+
+    function fillModalWrong(fb, res) {
+      modalBadge.textContent = (fb.decision === "Too little") ? "Too little ❌" : "Overwatered ❌";
+      modalBadge.style.background = "#ff9aa1";
+      modalBadge.style.borderColor = "#9e2530";
+
+      modalBody.innerHTML = `
+        <div><span class="error-emoji">⚠️</span><strong>Try again</strong></div>
+        <div style="margin-top:8px">
+          Soil: ${fb.soilType} (cap ${fb.capacity}%)<br>
+          Crop: ${fb.crop} (ideal ${fb.idealRange[0]}%–${fb.idealRange[1]}%)<br>
+          Old: ${fb.oldMoisture}% | Added: ${fb.waterAdded}% → New: <strong>${fb.newMoisture}%</strong><br>
+          ${fb.forecastRain ? "Rain is forecast 🌧️ — be conservative." : "No rain expected ☀️."}
+        </div>
+        ${buildWrongAdvice(fb)}
+      `;
+
+      modalActions.innerHTML = `
+        <button id="btnRetry" class="btn btn-cta">Retry</button>
+        <button id="btnCloseModal" class="btn">Close</button>
+      `;
+
+      document.getElementById("btnCloseModal").onclick = hideModal;
+      document.getElementById("btnRetry").onclick = async () => {
+        const stateData = await getJSON("/api/state");
+        lastState = stateData.state;
+        await refreshUI(lastState, "Adjust your water and press Done again.");
+        hideModal();
+      };
+    }
+
+    // Submit ("Done")
+    btnSubmit.addEventListener("click", async () => {
+      const res = await postJSON("/api/evaluate", { waterAdded: waterToAdd });
+      if (!res.ok) {
+        alert(res.error || "Something went wrong.");
+        return;
+      }
+      lastResult = res;
+
+      const fb = res.feedback;
+      const msg = [
+        `<strong>${fb.decision}</strong>`,
+        `Soil: ${fb.soilType}`,
+        `Crop: ${fb.crop}`,
+        `Old: ${fb.oldMoisture}% | Added: ${fb.waterAdded}%`,
+        `New: ${fb.newMoisture}% (cap ${fb.capacity}%)`,
+        `Ideal: ${fb.idealRange[0]}%–${fb.idealRange[1]}%`,
+        `Rain: ${fb.forecastRain ? "Yes" : "No"}`
+      ].join("<br>");
+      if (currentPolygon) currentPolygon.bindPopup(msg).openPopup();
+
+      if (res.advance) {
+        fillModalSuccess(fb, res);
+      } else {
+        fillModalWrong(fb, res);
+      }
+      showModal();
+    });
+
+    // Initialize page at requested level
+    (async function init() {
+      const data = await postJSON("/api/set_level", { level: INITIAL_LEVEL });
+      if (data.ok) {
+        currentLevel = data.currentLevel;
+        lastState = data.state;
+        await refreshUI(lastState);
+      }
+    })();
+
+    // Extra: keyboard shortcuts for water adjust (optional)
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp") { waterToAdd = Math.min(100, waterToAdd + 1); refreshWaterUI(lastState); renderRightPanel(lastState, "", {}); }
+      if (e.key === "ArrowDown") { waterToAdd = Math.max(0, waterToAdd - 1); refreshWaterUI(lastState); renderRightPanel(lastState, "", {}); }
+      if (e.key.toLowerCase() === "enter") { btnSubmit.click(); }
+    });
+  </script>
+</body>
+</html>

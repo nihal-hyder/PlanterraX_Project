@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANTERRAX | Sustainable Farming Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            color: #2d5016;
+            overflow-x: hidden;
+            background: #87CEEB;
+            image-rendering: pixelated;
+        }
+
+        /* Navigation Bar - Game Style */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #2d5016;
+            border-bottom: 4px solid #1a3009;
+            padding: 1rem 3%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 0 #000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #90EE90;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 0 #1a3009;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #8B4513;
+            border: 3px solid #654321;
+            border-radius: 5px;
+            padding: 5px;
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #90EE90;
+            text-decoration: none;
+            font-size: 1.3rem;
+            padding: 0.5rem 1rem;
+            background: #1a3009;
+            border: 3px solid #2d5016;
+            border-radius: 5px;
+            transition: all 0.1s ease;
+            box-shadow: 3px 3px 0 #000;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .nav-links a:hover {
+            background: #4CAF50;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
+        }
+
+        .nav-links a:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        /* Hero Section - Game World */
+        .hero {
+            min-height: 100vh;
+            padding-top: 80px;
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #8B7355 50%, #654321 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Pixel clouds */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.9;
+            animation: float-cloud 20s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud1 {
+            width: 80px;
+            height: 30px;
+            top: 15%;
+            left: -100px;
+        }
+
+        .cloud1::before {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 50px;
+            height: 35px;
+            top: -10px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 100px;
+            height: 35px;
+            top: 25%;
+            left: -150px;
+            animation-delay: 10s;
+        }
+
+        .cloud2::before {
+            width: 50px;
+            height: 50px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud2::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 15px;
+        }
+
+        @keyframes float-cloud {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        /* Pixel sun */
+        .sun {
+            position: absolute;
+            top: 120px;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #FFD700, 0 0 40px #FFA500;
+            animation: pulse-sun 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-sun {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Animated plant in hero */
+        .hero-plant {
+            position: relative;
+            margin: 2rem 0;
+            animation: grow 2s ease-out;
+        }
+
+        @keyframes grow {
+            0% {
+                transform: scale(0) translateY(50px);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .plant-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.3));
+        }
+
+        .leaves {
+            display: flex;
+            gap: 5px;
+            margin-bottom: -10px;
+            z-index: 2;
+        }
+
+        .leaf {
+            width: 40px;
+            height: 60px;
+            background: #4CAF50;
+            border: 3px solid #2d5016;
+            border-radius: 50% 50% 50% 0;
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        .leaf:first-child {
+            transform: rotate(-45deg);
+        }
+
+        .leaf:last-child {
+            transform: rotate(45deg) scaleX(-1);
+        }
+
+        .stem {
+            width: 20px;
+            height: 80px;
+            background: #4CAF50;
+            border: 3px solid #2d5016;
+            box-shadow: 3px 3px 0 #000;
+            z-index: 1;
+        }
+
+        .soil {
+            width: 150px;
+            height: 40px;
+            background: #8B4513;
+            border: 3px solid #654321;
+            border-radius: 10px;
+            box-shadow: 4px 4px 0 #000;
+            margin-top: -5px;
+        }
+
+        .hero-content {
+            z-index: 10;
+            max-width: 900px;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 3rem;
+            color: #2d5016;
+            margin-bottom: 1rem;
+            text-shadow: 4px 4px 0 #90EE90, 6px 6px 0 #000;
+            animation: bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero p {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 2rem;
+            text-shadow: 3px 3px 0 #000;
+            background: rgba(45, 80, 22, 0.8);
+            padding: 1rem 2rem;
+            border: 3px solid #1a3009;
+            display: inline-block;
+            border-radius: 5px;
+        }
+
+        .cta-button {
+            background: #FFD700;
+            color: #2d5016;
+            padding: 1.5rem 3rem;
+            border: 4px solid #FFA500;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 5px 5px 0 #000;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+        }
+
+        .cta-button:hover {
+            background: #FFA500;
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #000;
+        }
+
+        .cta-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        /* Features Section - Game Cards */
+        .features {
+            padding: 4rem 5%;
+            background: #8B7355;
+            border-top: 5px solid #654321;
+            position: relative;
+        }
+
+        .grass-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: repeating-linear-gradient(90deg, #4CAF50 0px, #4CAF50 10px, #3d8b40 10px, #3d8b40 20px);
+            border-bottom: 3px solid #2d5016;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2rem;
+            color: #FFD700;
+            margin: 2rem 0 3rem 0;
+            text-shadow: 3px 3px 0 #000;
+        }
+
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #D2B48C;
+            border: 5px solid #8B4513;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 6px 6px 0 #000;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(139, 69, 19, 0.1) 10px, rgba(139, 69, 19, 0.1) 20px);
+            z-index: -1;
+            border-radius: 10px;
+        }
+
+        .card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 9px 9px 0 #000;
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: #2d5016;
+            border: 4px solid #1a3009;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .card h3 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: #2d5016;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+        }
+
+        .card p {
+            color: #2d5016;
+            line-height: 1.6;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        /* Footer - Game Style */
+        footer {
+            background: #1a3009;
+            color: #90EE90;
+            text-align: center;
+            padding: 2rem;
+            border-top: 5px solid #2d5016;
+            font-size: 1.3rem;
+        }
+
+        footer p {
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        footer a {
+            color: #FFD700;
+            text-decoration: none;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        footer a:hover {
+            color: #FFA500;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1a3009;
+            border: 3px solid #2d5016;
+            color: #90EE90;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        .mobile-menu-btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                right: -100%;
+                background: #2d5016;
+                border-left: 4px solid #1a3009;
+                flex-direction: column;
+                padding: 2rem;
+                width: 80%;
+                height: calc(100vh - 80px);
+                transition: right 0.3s ease;
+                box-shadow: -4px 0 0 #000;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+                text-shadow: 3px 3px 0 #90EE90, 4px 4px 0 #000;
+            }
+
+            .hero p {
+                font-size: 1.5rem;
+                padding: 0.8rem 1.5rem;
+            }
+
+            .cta-button {
+                font-size: 1rem;
+                padding: 1rem 2rem;
+            }
+
+            .logo {
+                font-size: 0.8rem;
+            }
+
+            .features h2 {
+                font-size: 1.3rem;
+            }
+
+            .leaf {
+                width: 30px;
+                height: 45px;
+            }
+
+            .stem {
+                width: 15px;
+                height: 60px;
+            }
+
+            .soil {
+                width: 100px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='200' fill='%23003d4d'/%3E%3Cpath d='M200 100 C180 100 160 110 145 125 C145 145 145 165 160 180 L185 205 L175 215 L140 180 C120 160 115 140 115 120 C120 100 130 85 145 75 C160 65 180 60 200 60 C220 60 240 65 255 75 C270 85 280 100 285 120 C285 140 280 160 260 180 L225 215 L215 205 L240 180 C255 165 255 145 255 125 C240 110 220 100 200 100 Z' fill='%234CAF50'/%3E%3Cpath d='M165 160 C170 145 180 135 190 130 C200 125 210 125 220 130 C230 135 240 145 245 160 L200 205 L165 160 Z' fill='%2366bb6a'/%3E%3Cpath d='M200 210 L120 290 C110 300 100 305 90 310 L90 340 C110 335 130 325 145 310 L200 255 L255 310 C270 325 290 335 310 340 L310 310 C300 305 290 300 280 290 L200 210 Z' fill='%234CAF50'/%3E%3Ccircle cx='170' cy='140' r='3' fill='white'/%3E%3Ccircle cx='190' cy='130' r='2' fill='white'/%3E%3Ccircle cx='230' cy='140' r='3' fill='white'/%3E%3Ccircle cx='250' cy='135' r='2' fill='white'/%3E%3C/svg%3E" alt="PLANTERRAX">
+            </div>
+            <span>PLANTERRAX</span>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">MENU</button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="chatbot">CHATBOT</a></li>
+            <li><a href="feedback">FEEDBACK</a></li>
+            <li><a href="about">ABOUT</a></li>
+            <li><a href="login">LOGIN</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="sun"></div>
+        
+        <div class="hero-content">
+            <h1>PLANTERRAX</h1>
+            
+            <div class="hero-    plant">
+                <div class="plant-container">
+                    <div class="leaves">
+                        <div class="leaf"></div>
+                        <div class="leaf"></div>
+                    </div>
+                    <div class="stem"></div>
+                    <div class="soil"></div>
+                </div>
+            </div>
+            
+            <p>Farm with Real NASA Satellite Data!</p>
+            <form action="/" method="post">
+                <button type="submit" class="cta-button" id="ctaBtn">START GAME</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="grass-strip"></div>
+        <h2>GAME FEATURES</h2>
+        <div class="feature-cards">
+            <div class="card">
+                <div class="card-icon">🛰️</div>
+                <h3>SATELLITE DATA</h3>
+                <p>Use real NASA satellite imagery to scan your farm and understand weather patterns!</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🌱</div>
+                <h3>SMART FARMING</h3>
+                <p>Plant crops, manage water, and make decisions based on actual climate data!</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>TRACK IMPACT</h3>
+                <p>Watch your farm grow and see how sustainable choices help the planet!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p><strong>PLANTERRAX - NASA SPACE APPS 2024</strong></p>
+        <p>Built with <a href="https://www.spaceappschallenge.org/" target="_blank">NASA Open Data</a></p>
+        <p>© 2024 - Play, Learn, Grow Sustainably</p>
+    </footer>
+
+    
+</body>
+</html>

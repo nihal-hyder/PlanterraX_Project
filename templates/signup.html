@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PLANTERRAX - Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * { 
+      margin:0; 
+      padding:0; 
+      box-sizing:border-box; 
+    }
+    
+    body {
+      font-family: 'VT323', monospace;
+      background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 40%, #8B7355 60%, #654321 100%);
+      min-height:100vh; 
+      display:flex; 
+      justify-content:center; 
+      align-items:center;
+      margin:0;
+      position: relative;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+
+    /* Animated background elements */
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.9;
+      animation: float-cloud 25s linear infinite;
+    }
+
+    .cloud::before,
+    .cloud::after {
+      content: '';
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .cloud1 {
+      width: 80px;
+      height: 30px;
+      top: 10%;
+      left: -100px;
+    }
+
+    .cloud1::before {
+      width: 40px;
+      height: 40px;
+      top: -15px;
+      left: 10px;
+    }
+
+    .cloud1::after {
+      width: 50px;
+      height: 35px;
+      top: -10px;
+      right: 10px;
+    }
+
+    .cloud2 {
+      width: 100px;
+      height: 35px;
+      top: 20%;
+      left: -150px;
+      animation-delay: 12s;
+    }
+
+    .cloud2::before {
+      width: 50px;
+      height: 50px;
+      top: -20px;
+      left: 15px;
+    }
+
+    .cloud2::after {
+      width: 60px;
+      height: 40px;
+      top: -15px;
+      right: 15px;
+    }
+
+    @keyframes float-cloud {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100vw + 200px)); }
+    }
+
+    .sun {
+      position: absolute;
+      top: 50px;
+      right: 10%;
+      width: 60px;
+      height: 60px;
+      background: #FFD700;
+      border-radius: 50%;
+      box-shadow: 0 0 20px #FFD700, 0 0 40px #FFA500;
+      animation: pulse-sun 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-sun {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Signup Container - Game Card Style */
+    .signup-container {
+      background: #D2B48C;
+      padding: 40px 35px;
+      border: 6px solid #8B4513;
+      border-radius: 15px;
+      box-shadow: 8px 8px 0 #000;
+      width: 450px;
+      max-width: 90%;
+      text-align: center;
+      color: #2d5016;
+      position: relative;
+      z-index: 10;
+      animation: slideDown 0.5s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .signup-container::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(139, 69, 19, 0.1) 10px,
+        rgba(139, 69, 19, 0.1) 20px
+      );
+      z-index: -1;
+      border-radius: 15px;
+    }
+
+    /* Logo/Title Area */
+    .signup-header {
+      margin-bottom: 30px;
+    }
+
+    .signup-logo {
+      width: 80px;
+      height: 80px;
+      background: #2d5016;
+      border: 4px solid #1a3009;
+      border-radius: 10px;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    .signup-container h2 {
+      font-family: 'Press Start 2P', cursive;
+      margin-bottom: 10px;
+      color: #2d5016;
+      font-size: 1.6rem;
+      text-shadow: 3px 3px 0 rgba(255,255,255,0.5);
+    }
+
+    .signup-subtitle {
+      font-size: 1.4rem;
+      color: #654321;
+      margin-bottom: 20px;
+    }
+
+    /* Error/Success message styling */
+    .message {
+      padding: 12px;
+      border: 3px solid;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      
+      box-shadow: 3px 3px 0 #000;
+      animation: shake 0.5s ease;
+    }
+
+    .error-message {
+      background: #ff6b6b;
+      color: white;
+      border-color: #c92a2a;
+    }
+
+    .success-message {
+      background: #90EE90;
+      color: #2d5016;
+      border-color: #4CAF50;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* Input fields - Game style */
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-label {
+      display: block;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+      color: #2d5016;
+      margin-bottom: 8px;
+      text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+    }
+
+    .signup-container input {
+      width: 100%;
+      padding: 15px;
+      border: 4px solid #8B4513;
+      border-radius: 8px;
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem;
+      outline: none;
+      transition: all 0.2s;
+      background: #F5DEB3;
+      color: #2d5016;
+      box-shadow: inset 3px 3px 0 rgba(0,0,0,0.2);
+    }
+
+    .signup-container input:focus {
+      border-color: #4CAF50;
+      background: #FFF8DC;
+      box-shadow: inset 3px 3px 0 rgba(0,0,0,0.2), 0 0 0 3px rgba(76, 175, 80, 0.3);
+    }
+
+    .signup-container input::placeholder {
+      color: #8B7355;
+    }
+
+    /* Button - Game style */
+    .signup-container button {
+      width: 100%;
+      padding: 18px;
+      margin-top: 10px;
+      border: 4px solid #FFA500;
+      border-radius: 8px;
+      background: #FFD700;
+      color: #2d5016;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.1s;
+      box-shadow: 5px 5px 0 #000;
+      text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+    }
+
+    .signup-container button:hover {
+      background: #FFA500;
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0 #000;
+    }
+
+    .signup-container button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 3px 3px 0 #000;
+    }
+
+    /* Links - Game style */
+    .signup-links {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .signup-container a {
+      display: inline-block;
+      font-size: 1.3rem;
+      color: #2d5016;
+      text-decoration: none;
+      transition: all 0.2s;
+      padding: 10px;
+      background: rgba(139, 69, 19, 0.2);
+      border: 3px solid #8B4513;
+      border-radius: 8px;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    }
+
+    .signup-container a:hover {
+      color: #4CAF50;
+      background: rgba(76, 175, 80, 0.2);
+      border-color: #4CAF50;
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+    }
+
+    .signup-container a:active {
+      transform: translate(1px, 1px);
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    }
+
+    /* Divider */
+    .divider {
+      margin: 20px 0;
+      height: 3px;
+      background: #8B4513;
+      border-radius: 2px;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+    }
+
+    /* Password strength indicator */
+    .password-hint {
+      font-size: 1.2rem;
+      color: #654321;
+      margin-top: 5px;
+      text-align: left;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .signup-container {
+        padding: 30px 25px;
+        width: 95%;
+      }
+
+      .signup-container h2 {
+        font-size: 1.3rem;
+      }
+
+      .signup-container button {
+        font-size: 1rem;
+        padding: 15px;
+      }
+
+      .input-label {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cloud cloud1"></div>
+  <div class="cloud cloud2"></div>
+  <div class="sun"></div>
+
+  <div class="signup-container">
+    <div class="signup-header">
+      <div class="signup-logo">🌱</div>
+      <h2>PLANTERRAX</h2>
+      <div class="signup-subtitle">Create New Account</div>
+    </div>
+
+    {% if error %}
+    <div class="message error-message">
+      ⚠️ {{ error }}
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="message success-message">
+      ✅ {{ success }}
+    </div>
+    {% endif %}
+    
+    <form action="/signup" method="post">
+      <div class="input-group">
+        <label class="input-label" for="username">USERNAME</label>
+        <input name="username" id="username" type="text" placeholder="Choose a username" required minlength="3">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="email">EMAIL</label>
+        <input name="email" id="email" type="email" placeholder="your.email@example.com" required>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="password">PASSWORD</label>
+        <input name="password" id="password" type="password" placeholder="Create a strong password" required minlength="6">
+        <div class="password-hint">💡 Min 6 characters</div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="confirm_password">CONFIRM PASSWORD</label>
+        <input name="confirm_password" id="confirm_password" type="password" placeholder="Re-enter password" required>
+      </div>
+
+      <button type="submit">CREATE ACCOUNT</button>
+
+      <div class="divider"></div>
+
+      <div class="signup-links">
+        <a href="/">← Back to Home</a>
+        <a href="/login">Already have an account? Login</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Client-side password matching validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form');
+      const password = document.getElementById('password');
+      const confirmPassword = document.getElementById('confirm_password');
+
+      form.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+          e.preventDefault();
+          alert('⚠️ Passwords do not match! Please try again.');
+          confirmPassword.focus();
+        }
+      });
+
+      // Real-time password match indicator
+      confirmPassword.addEventListener('input', function() {
+        if (this.value && password.value !== this.value) {
+          this.style.borderColor = '#ff6b6b';
+        } else if (this.value && password.value === this.value) {
+          this.style.borderColor = '#4CAF50';
+        } else {
+          this.style.borderColor = '#8B4513';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

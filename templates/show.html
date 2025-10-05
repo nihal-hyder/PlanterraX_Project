@@ -1,0 +1,109 @@
+{# PLANTERRAX — Right-edge Data Panel (Jinja partial) #}
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+<style>
+  :root{ --space-blue:#003366; --earth-green:#4CAF50; --card:#fffdf6; --edge:3px; --shadow:0 14px 30px rgba(0,0,0,.35); }
+  .prx-tab{
+    position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:9999;
+    writing-mode:vertical-rl; text-orientation:mixed; user-select:none; cursor:pointer;
+    background:var(--earth-green); color:#fff; padding:14px 10px;
+    border-left:var(--edge) solid #1d3f1f; border-top:var(--edge) solid #1d3f1f; border-bottom:var(--edge) solid #1d3f1f;
+    border-radius:10px 0 0 10px; box-shadow:var(--shadow);
+    font-family:"Press Start 2P",cursive; letter-spacing:1px;
+  }
+  .prx-tab:focus{outline:2px dashed #fff; outline-offset:2px}
+
+  .prx-panel{
+    position:fixed; top:0; right:0; height:100%; width:min(360px,92vw); z-index:9998;
+    transform:translateX(100%); transition:transform .35s cubic-bezier(.2,.8,.2,1);
+    padding:16px; display:flex; flex-direction:column; gap:14px;
+    background:linear-gradient(180deg,#d7b07b 0%,#c79a61 100%);
+    border-left:var(--edge) solid #3a2816; border-top:var(--edge) solid #3a2816; border-bottom:var(--edge) solid #3a2816;
+    box-shadow:var(--shadow);
+  }
+  .prx-panel.is-open{ transform:translateX(0) }
+
+  .prx-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 12px; background:var(--card);
+    border:var(--edge) solid #222; border-radius:10px;
+    box-shadow:inset 0 0 0 var(--edge) #fff, 0 6px 0 #0001;
+  }
+  .prx-title{ font-family:"Press Start 2P",cursive; font-size:12px; color:var(--space-blue); text-transform:uppercase; display:flex; gap:8px; align-items:center; }
+  .sprout{ width:20px; height:20px; display:grid; place-items:center; background:var(--earth-green); color:#fff; border:var(--edge) solid #222; border-radius:6px; box-shadow:inset 0 0 0 var(--edge) #c6f7c5; font-size:14px; }
+
+  .prx-close{
+    font-family:"Press Start 2P",cursive; font-size:10px; padding:10px 12px; background:#ffdd57;
+    border:var(--edge) solid #222; border-radius:8px; cursor:pointer; box-shadow:0 4px 0 #c9a62c; transition:transform .05s;
+  }
+  .prx-close:active{ transform:translateY(2px); box-shadow:0 2px 0 #c9a62c }
+  .prx-close:focus{ outline:2px dashed #222; outline-offset:3px }
+
+  .prx-list{
+    background:var(--card); border:var(--edge) solid #222; border-radius:12px; padding:12px;
+    overflow:auto; flex:1; box-shadow:inset 0 0 0 var(--edge) #fff;
+  }
+  .prx-row{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px; padding:14px 10px; border-bottom:2px dashed #cdbb9b; }
+  .prx-row:last-child{ border-bottom:none; }
+  .prx-key{ font-family:"Press Start 2P",cursive; font-size:13px; color:#111; text-shadow:0 1px 0 #fff; }
+  .prx-val{ font-size:16px; color:#444; opacity:.9; }
+  @media (max-width:420px){ .prx-key{font-size:12px} .prx-val{font-size:13px} }
+</style>
+
+{# --- ordered items using values from Flask `telemetry` dict --- #}
+{% set _items = [
+  ('effective rainfall',        (telemetry.get('effective_rainfall')        if telemetry is defined else None) or '(demo data)'),
+  ('field capacity',            (telemetry.get('field_capacity')            if telemetry is defined else None) or '(demo data)'),
+  ('soil mostureis',            (telemetry.get('soil_mostureis')            if telemetry is defined else None) or '(demo data)'),
+  ('Crop Evapotranspiration',   (telemetry.get('crop_evapotranspiration')   if telemetry is defined else None) or '(demo data)')
+] %}
+
+<!-- opener -->
+<button id="prxOpenTab" class="prx-tab" aria-controls="prxPanel" aria-expanded="false">DATA</button>
+
+<!-- panel -->
+<aside id="prxPanel" class="prx-panel" role="dialog" aria-modal="true" aria-labelledby="prxTitle" aria-hidden="true">
+  <div class="prx-head">
+    <div class="prx-title" id="prxTitle"><span class="sprout">🌱</span> Field Telemetry</div>
+    <button class="prx-close" id="prxCloseBtn" type="button">CLOSE</button>
+  </div>
+
+  <div class="prx-list">
+    {% for label, value in _items %}
+      <div class="prx-row">
+        <div class="prx-key">{{ label }}</div>
+        <div class="prx-val">{{ value }}</div>
+      </div>
+    {% endfor %}
+  </div>
+</aside>
+
+<script>
+  (function(){
+    const panel = document.getElementById('prxPanel');
+    const openTab = document.getElementById('prxOpenTab');
+    const closeBtn = document.getElementById('prxCloseBtn');
+
+    function openPanel(){
+      panel.classList.add('is-open');
+      panel.setAttribute('aria-hidden','false');
+      openTab.setAttribute('aria-expanded','true');
+      setTimeout(()=>closeBtn.focus(),120);
+    }
+    function closePanel(){
+      panel.classList.remove('is-open');
+      panel.setAttribute('aria-hidden','true');
+      openTab.setAttribute('aria-expanded','false');
+      openTab.focus();
+    }
+
+    openTab.addEventListener('click', openPanel);
+    closeBtn.addEventListener('click', closePanel);
+    window.addEventListener('keydown', e => { if(e.key==='Escape' && panel.classList.contains('is-open')) closePanel(); });
+    document.addEventListener('click', e => {
+      if(!panel.classList.contains('is-open')) return;
+      const inside = panel.contains(e.target) || openTab.contains(e.target);
+      if(!inside) closePanel();
+    });
+  })();
+</script>

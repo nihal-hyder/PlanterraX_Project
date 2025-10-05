@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANTERRAX - Feedback</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 40%, #8B7355 60%, #654321 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+        }
+
+        /* Animated background elements */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.9;
+            animation: float-cloud 25s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud1 {
+            width: 80px;
+            height: 30px;
+            top: 10%;
+            left: -100px;
+        }
+
+        .cloud1::before {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 50px;
+            height: 35px;
+            top: -10px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 100px;
+            height: 35px;
+            top: 20%;
+            left: -150px;
+            animation-delay: 12s;
+        }
+
+        .cloud2::before {
+            width: 50px;
+            height: 50px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud2::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 15px;
+        }
+
+        @keyframes float-cloud {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        .sun {
+            position: absolute;
+            top: 50px;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #FFD700, 0 0 40px #FFA500;
+            animation: pulse-sun 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-sun {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Form Container - Game Card Style */
+        .form-container {
+            background: #D2B48C;
+            padding: 40px 35px;
+            border: 6px solid #8B4513;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0 #000;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 30px;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(139, 69, 19, 0.1) 10px,
+                rgba(139, 69, 19, 0.1) 20px
+            );
+            z-index: -1;
+            border-radius: 15px;
+        }
+
+        /* Header with Icon */
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-icon {
+            width: 80px;
+            height: 80px;
+            background: #2d5016;
+            border: 4px solid #1a3009;
+            border-radius: 10px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .form-container h2 {
+            font-family: 'Press Start 2P', cursive;
+            color: #2d5016;
+            font-size: 1.8rem;
+            text-shadow: 3px 3px 0 rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            font-size: 1.4rem;
+            color: #654321;
+            margin-bottom: 20px;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: #2d5016;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 4px solid #8B4513;
+            border-radius: 8px;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            outline: none;
+            transition: all 0.2s;
+            background: #F5DEB3;
+            color: #2d5016;
+            box-shadow: inset 3px 3px 0 rgba(0,0,0,0.2);
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #4CAF50;
+            background: #FFF8DC;
+            box-shadow: inset 3px 3px 0 rgba(0,0,0,0.2), 0 0 0 3px rgba(76, 175, 80, 0.3);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #8B7355;
+        }
+
+        textarea {
+            resize: none;
+            min-height: 150px;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: #FFD700;
+            color: #2d5016;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            border: 4px solid #FFA500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 5px 5px 0 #000;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+        }
+
+        .btn-submit:hover {
+            background: #FFA500;
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #000;
+        }
+
+        .btn-submit:active {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        /* Output Box - Game Result Card */
+        .feedback-output {
+            background: #90EE90;
+            padding: 30px;
+            border: 6px solid #4CAF50;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0 #000;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 10;
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .feedback-output::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(76, 175, 80, 0.1) 10px,
+                rgba(76, 175, 80, 0.1) 20px
+            );
+            z-index: -1;
+            border-radius: 15px;
+        }
+
+        .feedback-output h3 {
+            font-family: 'Press Start 2P', cursive;
+            color: #2d5016;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+        }
+
+        .feedback-item {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border: 3px solid #2d5016;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+
+        .feedback-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .feedback-output p {
+            font-size: 1.4rem;
+            color: #2d5016;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .feedback-output strong {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            color: #1a3009;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Success Icon */
+        .success-icon {
+            text-align: center;
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: pulse 1s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #4CAF50;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            text-decoration: none;
+            border: 4px solid #2d5016;
+            border-radius: 8px;
+            box-shadow: 4px 4px 0 #000;
+            transition: all 0.1s;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background: #45a049;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #000;
+        }
+
+        .back-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .form-container,
+            .feedback-output {
+                padding: 30px 20px;
+                max-width: 95%;
+            }
+
+            .form-container h2 {
+                font-size: 1.3rem;
+            }
+
+            .btn-submit {
+                font-size: 1rem;
+                padding: 15px;
+            }
+
+            label {
+                font-size: 0.75rem;
+            }
+
+            .feedback-output h3 {
+                font-size: 1.2rem;
+            }
+
+            .back-button {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="sun"></div>
+
+    <!-- Feedback Form -->
+    <div class="form-container">
+        <div class="form-header">
+            <div class="form-icon">📝</div>
+            <h2>FEEDBACK</h2>
+            <div class="form-subtitle">Help us improve the game!</div>
+        </div>
+        
+        <form action="/feedback" method="POST">
+            <div class="form-group">
+                <label for="name">PLAYER NAME</label>
+                <input type="text" id="name" name="user_name" placeholder="Enter your name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="feedback">YOUR FEEDBACK</label>
+                <textarea id="feedback" name="user_feed" placeholder="Tell us what you think..." required></textarea>
+            </div>
+            
+            <button type="submit" class="btn-submit">SUBMIT FEEDBACK</button>
+            <center>
+                <a href="/" class="back-button">← BACK HOME</a>
+            </center>        
+            
+        </form>
+            
+            
+       
+    </div>
+
+    
+
+
+
+
+    <!-- Output Box - Only shows when data exists -->
+    {% if welcome or feed_1 %}
+    <div class="feedback-output">
+        <div class="success-icon">✅</div>
+        <h3>FEEDBACK SAVED!</h3>
+        
+        {% if welcome %}
+        <div class="feedback-item">
+            <p><strong>PLAYER:</strong> {{ welcome }}</p>
+        </div>
+        {% endif %}
+        
+        {% if feed_1 %}
+        <div class="feedback-item">
+            <p><strong>MESSAGE:</strong> {{ feed_1 }}</p>
+        </div>
+        {% endif %}
+    
+    </div>
+    {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANTERRAX - Select Level</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #8B7355 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+        }
+
+        /* Animated background */
+        .cloud {
+            position: fixed;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.9;
+            animation: float-cloud 25s linear infinite;
+            z-index: 1;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud1 {
+            width: 80px;
+            height: 30px;
+            top: 10%;
+            left: -100px;
+        }
+
+        .cloud1::before {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 50px;
+            height: 35px;
+            top: -10px;
+            right: 10px;
+        }
+
+        .sun {
+            position: fixed;
+            top: 30px;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #FFD700, 0 0 40px #FFA500;
+            animation: pulse-sun 3s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes float-cloud {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        @keyframes pulse-sun {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Header */
+        .header {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        .header h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: #2d5016;
+            text-shadow: 4px 4px 0 #90EE90, 6px 6px 0 #000;
+            margin-bottom: 15px;
+            animation: bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .welcome-text {
+            font-size: 2rem;
+            color: #fff;
+            text-shadow: 3px 3px 0 #000;
+            background: rgba(45, 80, 22, 0.8);
+            padding: 1rem 2rem;
+            border: 3px solid #1a3009;
+            display: inline-block;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.6rem;
+            color: #2d5016;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.7);
+        }
+
+        /* Level Path Container */
+        .level-path {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 100px;
+            z-index: 10;
+        }
+
+        /* SVG Path for vine */
+        .vine-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Level Cards */
+        .level-card {
+            position: relative;
+            background: #D2B48C;
+            border: 6px solid #8B4513;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0 #000;
+            padding: 30px;
+            margin: 60px auto;
+            width: 280px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 5;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .level-card:nth-child(even) {
+            margin-left: auto;
+            margin-right: 10%;
+        }
+
+        .level-card:nth-child(odd) {
+            margin-left: 10%;
+            margin-right: auto;
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(139, 69, 19, 0.1) 10px, rgba(139, 69, 19, 0.1) 20px);
+            z-index: -1;
+            border-radius: 15px;
+        }
+
+        .level-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 11px 11px 0 #000;
+        }
+
+        .level-card.locked {
+            background: #A9A9A9;
+            border-color: #696969;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .level-card.locked:hover {
+            transform: none;
+            box-shadow: 8px 8px 0 #000;
+        }
+
+        .level-icon {
+            width: 80px;
+            height: 80px;
+            background: #2d5016;
+            border: 4px solid #1a3009;
+            border-radius: 10px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .level-card.locked .level-icon {
+            background: #696969;
+            border-color: #2d2d2d;
+        }
+
+        .level-number {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.8rem;
+            color: #2d5016;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+        }
+
+        .level-card.locked .level-number {
+            color: #2d2d2d;
+        }
+
+        .level-title {
+            font-size: 1.4rem;
+            color: #654321;
+            margin-bottom: 15px;
+        }
+
+        .level-description {
+            font-size: 1.2rem;
+            color: #2d5016;
+            line-height: 1.5;
+        }
+
+        .level-card.locked .level-description {
+            color: #4d4d4d;
+        }
+
+        .lock-icon {
+            font-size: 2rem;
+            margin-top: 10px;
+        }
+
+        /* Play Button */
+        .play-button {
+            background: #FFD700;
+            color: #2d5016;
+            padding: 12px 30px;
+            border: 4px solid #FFA500;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 4px 4px 0 #000;
+            transition: all 0.1s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .play-button:hover {
+            background: #FFA500;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #000;
+        }
+
+        .play-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        /* Plant decorations along the path */
+        .plant-decoration {
+            position: absolute;
+            font-size: 2rem;
+            z-index: 2;
+            animation: sway 3s ease-in-out infinite;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 15px 40px;
+            border: 4px solid #2d5016;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 5px 5px 0 #000;
+            transition: all 0.1s;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            background: #45a049;
+            transform: translateX(-50%) translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #000;
+        }
+
+        .back-button:active {
+            transform: translateX(-50%) translate(2px, 2px);
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+                text-shadow: 3px 3px 0 #90EE90, 4px 4px 0 #000;
+            }
+
+            .welcome-text {
+                font-size: 1.5rem;
+                padding: 0.8rem 1.5rem;
+            }
+
+            .level-card {
+                width: 90%;
+                margin: 60px auto !important;
+            }
+
+            .level-card:nth-child(even),
+            .level-card:nth-child(odd) {
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+
+            .back-button {
+                font-size: 0.8rem;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cloud cloud1"></div>
+    <div class="sun"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>PLANTERRAX</h1>
+        <div class="welcome-text">Welcome {{ usr }}!</div>
+        <div class="subtitle">Choose Your Farming Challenge</div>
+    </div>
+
+    <!-- Level Path -->
+    <div class="level-path">
+        <!-- Plant decorations -->
+        <div class="plant-decoration" style="top: 100px; left: 15%;">🌿</div>
+        <div class="plant-decoration" style="top: 350px; right: 10%;">🌾</div>
+        <div class="plant-decoration" style="top: 600px; left: 12%;">🌻</div>
+        <div class="plant-decoration" style="top: 850px; right: 15%;">🌱</div>
+        <div class="plant-decoration" style="top: 1100px; left: 18%;">🌿</div>
+
+        <!-- SVG Vine Path -->
+        <svg class="vine-path" viewBox="0 0 900 1500" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <filter id="leafShadow">
+                    <feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+                </filter>
+            </defs>
+            
+            <!-- Main vine path with smooth curves -->
+            <path d="M 200 80 
+                     C 200 150, 400 180, 600 250
+                     C 750 300, 800 400, 700 480
+                     C 600 560, 300 540, 200 650
+                     C 100 760, 150 900, 350 980
+                     C 550 1060, 750 1050, 700 1180
+                     C 650 1310, 450 1320, 300 1400" 
+                  stroke="#4CAF50" 
+                  stroke-width="12" 
+                  fill="none" 
+                  stroke-linecap="round"
+                  opacity="0.8"/>
+            
+            <!-- Secondary vine for depth -->
+            <path d="M 200 80 
+                     C 200 150, 400 180, 600 250
+                     C 750 300, 800 400, 700 480
+                     C 600 560, 300 540, 200 650
+                     C 100 760, 150 900, 350 980
+                     C 550 1060, 750 1050, 700 1180
+                     C 650 1310, 450 1320, 300 1400" 
+                  stroke="#2d5016" 
+                  stroke-width="8" 
+                  fill="none" 
+                  stroke-linecap="round"
+                  opacity="0.5"/>
+            
+            <!-- Leaves along the vine -->
+            <ellipse cx="300" cy="170" rx="15" ry="25" fill="#4CAF50" transform="rotate(-30 300 170)" filter="url(#leafShadow)"/>
+            <ellipse cx="500" cy="270" rx="15" ry="25" fill="#4CAF50" transform="rotate(20 500 270)" filter="url(#leafShadow)"/>
+            <ellipse cx="680" cy="410" rx="15" ry="25" fill="#66bb6a" transform="rotate(-40 680 410)" filter="url(#leafShadow)"/>
+            <ellipse cx="450" cy="570" rx="15" ry="25" fill="#4CAF50" transform="rotate(35 450 570)" filter="url(#leafShadow)"/>
+            <ellipse cx="220" cy="750" rx="15" ry="25" fill="#66bb6a" transform="rotate(-25 220 750)" filter="url(#leafShadow)"/>
+            <ellipse cx="280" cy="900" rx="15" ry="25" fill="#4CAF50" transform="rotate(15 280 900)" filter="url(#leafShadow)"/>
+            <ellipse cx="500" cy="1050" rx="15" ry="25" fill="#66bb6a" transform="rotate(-35 500 1050)" filter="url(#leafShadow)"/>
+            <ellipse cx="650" cy="1200" rx="15" ry="25" fill="#4CAF50" transform="rotate(25 650 1200)" filter="url(#leafShadow)"/>
+        </svg>
+
+        <!-- Level 1 -->
+        <div class="level-card" onclick="location.href='/game/level1'">
+            <div class="level-icon">🌱</div>
+            <div class="level-number">LEVEL 1</div>
+            <div class="level-title">Seedling Farm</div>
+            <div class="level-description">Learn the basics of soil analysis and planting your first crops using NASA data.</div>
+            <a href="level_1" class="play-button">PLAY</a>
+        </div>
+
+        <!-- Level 2 - Locked -->
+        <div class="level-card locked">
+            <div class="level-icon">🔒</div>
+            <div class="level-number">LEVEL 2</div>
+            <div class="level-title">Water Wisdom</div>
+            <div class="level-description">Master irrigation timing using satellite moisture data and weather patterns.</div>
+            <div class="lock-icon">🔐</div>
+        </div>
+
+        <!-- Level 3 - Locked -->
+        <div class="level-card locked">
+            <div class="level-icon">🔒</div>
+            <div class="level-number">LEVEL 3</div>
+            <div class="level-title">Harvest Heights</div>
+            <div class="level-description">Optimize crop rotation and fertilization for maximum sustainable yield.</div>
+            <div class="lock-icon">🔐</div>
+        </div>
+
+        <!-- Level 4 - Locked -->
+        <div class="level-card locked">
+            <div class="level-icon">🔒</div>
+            <div class="level-number">LEVEL 4</div>
+            <div class="level-title">Climate Champion</div>
+            <div class="level-description">Face extreme weather challenges and adapt your farming strategy.</div>
+            <div class="lock-icon">🔐</div>
+        </div>
+
+        <!-- Level 5 - Locked -->
+        <div class="level-card locked">
+            <div class="level-icon">🔒</div>
+            <div class="level-number">LEVEL 5</div>
+            <div class="level-title">Sustainability Master</div>
+            <div class="level-description">Balance productivity with conservation in this ultimate challenge.</div>
+            <div class="lock-icon">🔐</div>
+        </div>
+
+        <!-- Level 6 - Locked -->
+        <div class="level-card locked">
+            <div class="level-icon">🔒</div>
+            <div class="level-number">LEVEL 6</div>
+            <div class="level-title">NASA Expert</div>
+            <div class="level-description">Apply advanced satellite data analysis to solve complex farming scenarios.</div>
+            <div class="lock-icon">🔐</div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <a href="/" class="back-button">← BACK TO HOME</a>
+
+    <script>
+        // Prevent clicks on locked levels
+        document.querySelectorAll('.level-card.locked').forEach(card => {
+            card.onclick = function(e) {
+                e.preventDefault();
+                alert('🔒 Complete previous levels to unlock!');
+            };
+        });
+    </script>
+</body>
+</html>
